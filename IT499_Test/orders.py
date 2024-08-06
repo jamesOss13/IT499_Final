@@ -5,6 +5,12 @@ import sqlite3
 class OrderManager:
     def __init__(self, app):
         self.app = app
+        self.address_entry = None
+        self.card_number_entry = None
+        self.expiry_date_entry = None
+        self.cvv_entry = None
+        self.shipping_frame = None
+        self.payment_frame = None
 
     def show_cart(self):
         self.clear_screen()
@@ -23,25 +29,29 @@ class OrderManager:
 
     def show_shipping_info(self):
         self.clear_screen()
-        tk.Label(self.app.root, text="Checkout - Shipping Info", font=("Helvetica", 16)).pack(pady=20)
-        tk.Label(self.app.root, text="Shipping Address").pack()
-        self.address_entry = tk.Entry(self.app.root)
+        self.shipping_frame = tk.Frame(self.app.root)
+        self.shipping_frame.pack(fill=tk.BOTH, expand=True)
+        tk.Label(self.shipping_frame, text="Checkout - Shipping Info", font=("Helvetica", 16)).pack(pady=20)
+        tk.Label(self.shipping_frame, text="Shipping Address").pack()
+        self.address_entry = tk.Entry(self.shipping_frame)
         self.address_entry.pack()
-        tk.Button(self.app.root, text="Next", command=self.show_payment_info, bg="lightblue").pack(pady=10)
+        tk.Button(self.shipping_frame, text="Next", command=self.show_payment_info, bg="lightblue").pack(pady=10)
 
     def show_payment_info(self):
-        self.clear_screen()
-        tk.Label(self.app.root, text="Checkout - Payment Info", font=("Helvetica", 16)).pack(pady=20)
-        tk.Label(self.app.root, text="Card Number").pack()
-        self.card_number_entry = tk.Entry(self.app.root)
+        self.shipping_frame.pack_forget()
+        self.payment_frame = tk.Frame(self.app.root)
+        self.payment_frame.pack(fill=tk.BOTH, expand=True)
+        tk.Label(self.payment_frame, text="Checkout - Payment Info", font=("Helvetica", 16)).pack(pady=20)
+        tk.Label(self.payment_frame, text="Card Number").pack()
+        self.card_number_entry = tk.Entry(self.payment_frame)
         self.card_number_entry.pack()
-        tk.Label(self.app.root, text="Expiry Date (MM/YY)").pack()
-        self.expiry_date_entry = tk.Entry(self.app.root)
+        tk.Label(self.payment_frame, text="Expiry Date (MM/YY)").pack()
+        self.expiry_date_entry = tk.Entry(self.payment_frame)
         self.expiry_date_entry.pack()
-        tk.Label(self.app.root, text="CVV").pack()
-        self.cvv_entry = tk.Entry(self.app.root, show='*')
+        tk.Label(self.payment_frame, text="CVV").pack()
+        self.cvv_entry = tk.Entry(self.payment_frame, show='*')
         self.cvv_entry.pack()
-        tk.Button(self.app.root, text="Place Order", command=self.place_order, bg="lightblue").pack(pady=10)
+        tk.Button(self.payment_frame, text="Place Order", command=self.place_order, bg="lightblue").pack(pady=10)
 
     def place_order(self):
         address = self.address_entry.get()
@@ -66,6 +76,7 @@ class OrderManager:
         conn.commit()
         conn.close()
         messagebox.showinfo("Success", "Order placed successfully")
+        self.clear_screen()
         self.app.show_product_screen()
 
     def clear_screen(self):
